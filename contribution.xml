@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sdkExtension xmlns="http://www.sap.com/bi/zen/sdk" id="com.leandro.gp.uitable"
+	title="Tree Table" version="1.0" vendor="Leandro">
+	<component id="uitable" title="Tree Table" tooltip="Tree Table"
+		icon="res/icon.png" handlerType="div"
+		propertySheetPath="res/additional_properties_sheet/additional_properties_sheet.html"
+		databound="true">
+		<jsInclude>res/js/component.js</jsInclude>
+
+
+		<property id="dataResultSet" type="ResultSet" title="Data" group="DataBinding" />
+
+
+
+		<property id="onclick" type="ScriptText" title="On Click"
+			group="Events" />
+
+		<initialization>
+			<defaultValue property="WIDTH">300</defaultValue>
+			<defaultValue property="HEIGHT">200</defaultValue>
+		</initialization>
+	</component>
+</sdkExtension>

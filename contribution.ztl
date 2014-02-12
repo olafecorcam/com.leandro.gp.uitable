@@ -1,0 +1,9 @@
+class com.leandro.gp.uitable.uitable extends Component {
+	String getClikedText(){*
+		return this.clickedText;
+	*}
+	Float getClikedValue(){*
+		return this.clickedValue;
+	*}
+	
+}
