@@ -46,9 +46,11 @@ sap.designstudio.sdk.Component
 			};
 			var objMedidas = new Array(numRowsOfData);
 			function hierqueriza() {
+				//here is where the magic happens
 				for ( var i = arrText.length - 1; i >= 0; i--) {
 
-					// aqui crio as métricas
+				// first a create a single object to hold all the measures
+				// So o check if the bottom array of data belongs to the measure part of the result
 				if ((arrText.length - 1) - i < numColsOfData) {
 					var medidas = arrText[i];
 
@@ -57,6 +59,9 @@ sap.designstudio.sdk.Component
 							objMedidas[m] = new Object();
 						objMedidas[m][medidas[0]] = medidas[m];
 					}
+					//since the measure group will always
+					//have the lenght of the entire resultset, theres no need to run through the
+					//rest of the code
 					continue;
 				}
 
@@ -66,31 +71,37 @@ sap.designstudio.sdk.Component
 				for ( var z = 1; z < firstLine.length; z++) {
 
 					if (firstLine[z]) {
-								// aqui verifico se e o primeiro cara depois das
-						// metricas
+						// here i check if its the first guy after the measures
+						// since i need to do a little more magic
 						if ((i + numColsOfData + 1) == arrText.length) {
 							objMedidas[z].texto = firstLine[z];
 							dados[z] = objMedidas[z];
 							continue;
-						} else {
+						} else { //here is the code that inserts the next guy
 							var temp = new Object();
 							temp.texto = firstLine[z];
 							arrTemp[z] = temp;
 						}
 						ultimo = z;
 					}
-					if (firstLine.length >= z + 1 && firstLine[z + 1]) {
+					if (firstLine.length >= z + 1
+							&& (firstLine[z + 1] || z == firstLine.length - 1)) {
 						var proximo = findNext(firstLine, z);
 						var atual = ultimo;
-						while (ultimo < proximo) {
-							if (!dados[atual])
-								dados[atual] = new Object();
-		
-							dados[atual][ultimo] = arrText[i + 1][ultimo];
-							ultimo++;
+						//se o item tem apenas um filho, aqui ele pega apenas ele e não faz o while
+						if(ultimo == proximo)
+							arrTemp[atual][ultimo] = objMedidas[ultimo];
+						else{
+							while (ultimo < proximo) {
+								arrTemp[atual][ultimo] = objMedidas[ultimo];
+								ultimo++;
+							}
 						}
+						
 					}
 		}
+		if (arrTemp[1])
+			objMedidas = arrTemp;
 	}
 }
 ;
@@ -129,7 +140,7 @@ function findNext(arrayText, start) {
 	var temp = start;
 	for ( var i = start; i < arrayText.length; i++) {
 		if (arrayText[i])
-			return i + 1;
+			return i;
 		else
 			temp++;
 	}
