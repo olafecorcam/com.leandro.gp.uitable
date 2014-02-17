@@ -12,6 +12,13 @@
 
 		<property id="columnWidths" type="String" title="Column Widths" group="DataBinding" />
 		
+		<property type="String" title="Expand First" id="expandFirst">
+			<possibleValue>YES</possibleValue>
+			<possibleValue>NO</possibleValue>
+		</property>
+		
+		<property type="String" title="Tree Header" id="treeHeader"/>
+		
 		<property id="onclick" type="ScriptText" title="On Click"
 			group="Events" />
 
@@ -19,6 +26,8 @@
 			<defaultValue property="columnWidths">70%,15%,15%</defaultValue>
 			<defaultValue property="WIDTH">300</defaultValue>
 			<defaultValue property="HEIGHT">200</defaultValue>
+			<defaultValue property="expandFirst">YES</defaultValue>
+			<defaultValue property="treeHeader">Header Text</defaultValue>
 		</initialization>
 	</component>
 </sdkExtension>

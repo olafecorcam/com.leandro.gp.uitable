@@ -3,6 +3,8 @@ sap.designstudio.sdk.Component
 
 			var data = null;
 			var objMedidas = null;
+			var _expandFirst = null;
+			var _treeHeader = null;
 
 			// object to hold the name of the measures when the data is made
 				// into an hierarqchy
@@ -29,6 +31,15 @@ sap.designstudio.sdk.Component
 						return this;
 					}
 				};
+
+				this.treeHeader = function(value) {
+					if (value === undefined) {
+						return _treeHeader;
+					} else {
+						_treeHeader = value;
+						return this;
+					}
+				};
 				this.columnWidths = function(value) {
 					if (value === undefined) {
 						return _columnWidths;
@@ -37,6 +48,16 @@ sap.designstudio.sdk.Component
 						return this;
 					}
 				};
+
+				this.expandFirst = function(value) {
+					if (value === undefined) {
+						return _expandFirst;
+					} else {
+						_expandFirst = value;
+						return this;
+					}
+				};
+
 				this.init = function() {
 				};
 
@@ -73,21 +94,30 @@ sap.designstudio.sdk.Component
 					}
 					var colunas = new Array();
 					colunas.push(new sap.ui.table.Column( {
-						label : "Descri&ccedil;&atilde;o",
+						label : _treeHeader,
 						template : "texto",
 						width : columnsSize[0]
 					}));
 
 					for ( var i = 0; i < measures.length; i++) {
-						if (measures[i])
+						if (measures[i]) {
+							var texto = new sap.ui.commons.TextView()
+									.bindProperty("text", measures[i]);
+							texto.setTextAlign(sap.ui.core.TextAlign.Right);
+							texto.setDesign(sap.ui.commons.TextViewDesign.Bold);
 							colunas.push(new sap.ui.table.Column( {
 								label : new sap.ui.commons.Label( {
 									text : measures[i],
 									textAlign : sap.ui.core.TextAlign.Center
 								}),
-								template : measures[i],
+								template : texto,
 								width : columnsSize[colunas.length]
 							}));
+						}
+					}
+					for ( var h = 0; h < colunas.length; h++) {
+						colunas[h]
+								.setHAlign(sap.ui.commons.layout.HAlign.Center);
 					}
 
 					// Create an instance of the table control
@@ -97,7 +127,8 @@ sap.designstudio.sdk.Component
 								visibleRowCountMode : sap.ui.table.VisibleRowCountMode.Auto,
 								selectionMode : sap.ui.table.SelectionMode.Single,
 								allowColumnReordering : true,
-								expandFirstLevel : false,
+								expandFirstLevel : _expandFirst == "YES" ? true
+										: false,
 								toggleOpenState : function(oEvent) {
 									var iRowIndex = oEvent
 											.getParameter("rowIndex");
@@ -131,7 +162,7 @@ sap.designstudio.sdk.Component
 							for ( var m = 1; m < medidas.length; m++) {
 								if (!objMedidas[m])
 									objMedidas[m] = new Object();
-								objMedidas[m][medidas[0]] = medidas[m];
+								objMedidas[m][medidas[0]] = formatNumero(medidas[m]);
 							}
 							// here i push in the measure names, so i can create
 							// the
@@ -174,12 +205,35 @@ sap.designstudio.sdk.Component
 								// se o item tem apenas um filho, aqui ele pega
 								// apenas
 								// ele e não faz o while
-								if (ultimo == proximo)
+								if (ultimo == proximo) {
 									arrTemp[atual][ultimo] = objMedidas[ultimo];
-								else {
+									// code for the totals
+									for ( var c = 0; c < measures.length; c++) {
+										if (!measures[c])
+											continue;
+										arrTemp[atual][measures[c]] = objMedidas[ultimo][measures[c]];
+									}
+								} else {
+									var objTotal = new Object();
 									while (ultimo < proximo) {
-										arrTemp[atual][ultimo] = objMedidas[ultimo];
+										if (objMedidas[ultimo]) {
+											arrTemp[atual][ultimo] = objMedidas[ultimo];
+											for ( var c = 0; c < measures.length; c++) {
+												if (!measures[c])
+													continue;
+												if (objTotal[measures[c]])
+													objTotal[measures[c]] = objTotal[measures[c]]
+															+ parseFloat(objMedidas[ultimo][measures[c]]);
+												else
+													objTotal[measures[c]] = parseFloat(objMedidas[ultimo][measures[c]]);
+											}
+										}
 										ultimo++;
+									}
+									for ( var c = 0; c < measures.length; c++) {
+										if (!measures[c])
+											continue;
+										arrTemp[atual][measures[c]] = objTotal[measures[c]];
 									}
 								}
 
@@ -190,7 +244,18 @@ sap.designstudio.sdk.Component
 					}
 				}
 				;
-
+				function formatNumero(number) {
+					number = number.toFixed(2) + '';
+					x = number.split('.');
+					x1 = x[0];
+					x2 = x.length > 1 ? '.' + x[1] : '';
+					var rgx = /(\d+)(\d{3})/;
+					while (rgx.test(x1)) {
+						x1 = x1.replace(rgx, '$1' + ',' + '$2');
+					}
+					return x1 + x2;
+				}
+				;
 				function findNext(arrayText, start) {
 					var temp = start;
 					for ( var i = start; i < arrayText.length; i++) {
@@ -200,9 +265,6 @@ sap.designstudio.sdk.Component
 							temp++;
 					}
 					return temp;
-
-				}
-				function teste(agoraVai, nivel) {
 
 				}
 				function computeTableLayout() {
