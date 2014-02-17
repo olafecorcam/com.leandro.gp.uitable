@@ -73,20 +73,19 @@ sap.designstudio.sdk.Component
 					}
 					var colunas = new Array();
 					colunas.push(new sap.ui.table.Column( {
-						label : "Descrição",
+						label : "Descri&ccedil;&atilde;o",
 						template : "texto",
 						width : columnsSize[0]
 					}));
 
 					for ( var i = 0; i < measures.length; i++) {
-						sap.ui.core.TextAlign.Begin
 						if (measures[i])
 							colunas.push(new sap.ui.table.Column( {
 								label : new sap.ui.commons.Label( {
 									text : measures[i],
-									textAlign : sap.ui.core.TextAlign.Begin
+									textAlign : sap.ui.core.TextAlign.Center
 								}),
-								template : "valor",
+								template : measures[i],
 								width : columnsSize[colunas.length]
 							}));
 					}
